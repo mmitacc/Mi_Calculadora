@@ -33,16 +33,18 @@ var Calculadora = (function () {
   //Método para la lectura de los datos
   var IngresoDatos = function (event) {
     var tecla = event.which || event.keyCode;
+    //alert(tecla);
     if (tecla != OnC) {
        var datovalidado = ValidarDato(tecla);
        if (datovalidado != "") {
         PresionarTecla(datovalidado);
         //AGREGAR ACUMULADORES PARA LAS OPERACIONES Y MOSTAR EN DISPLAY
-        document.getElementById("display").innerHTML=String.fromCharCode(tecla);
+        //document.getElementById("display").innerHTML=String.fromCharCode(tecla);
+        document.getElementById("display").innerHTML=datovalidado;
       };
     } else {
       PresionarTecla("on");
-      document.getElementById("display").innerHTML="borrados";
+      document.getElementById("display").innerHTML="0";
       dato1=""; signo1="+"; dato2=""; signo2="+"; operador=""; resultado="";
     };
     //Visualiza el dato en el DISPLAY
@@ -51,49 +53,49 @@ var Calculadora = (function () {
   var ValidarDato = function (dato) {
     var TipoDato="";
     switch (dato) {
-      case 48:
+      case 48: case 96:
         TipoDato="0";
         break;
-      case 49:
+      case 49: case 97:
         TipoDato="1";
         break;
-      case 50:
+      case 50: case 98:
         TipoDato="2";
         break;
-      case 51:
+      case 51: case 99:
         TipoDato="3";
         break;
-      case 52:
+      case 52: case 100:
         TipoDato="4";
         break;
-      case 53:
+      case 53: case 101:
         TipoDato="5";
         break;
-      case 54:
+      case 54: case 102:
         TipoDato="6";
         break;
-      case 55:
+      case 55: case 103:
         TipoDato="7";
         break;
-      case 56:
+      case 56: case 104:
         TipoDato="8";
         break;
-      case 57:
+      case 57: case 105:
         TipoDato="9";
         break;
-      case 46:
+      case 110: case 190:
         TipoDato="punto";
         break;
-      case 43:
+      case 107:
         TipoDato="mas";
         break;
-      case 45:
+      case 109:
         TipoDato="menos";
         break;
-      case 42:
+      case 106: case 187:
         TipoDato="por";
         break;
-      case 47:
+      case 111:
         TipoDato="dividido";
         break;
       case 13:
@@ -106,7 +108,7 @@ var Calculadora = (function () {
   };
   //Inicializando los métodos con eventos de teclado y mouse
   var iniciar = function () {
-    document.onkeypress=IngresoDatos;
+    document.onkeydown=IngresoDatos;
     document.onkeyup=SoltarTecla;
   };
   return {
