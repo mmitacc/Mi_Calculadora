@@ -1,7 +1,7 @@
 var Calculadora = (function () {
   //Declarando variables globales
   var dato1="", signo1="+", dato2="", signo2="+",
-      operador="", resultado="", OnC=46;
+      operador="", resultado="", data="0", flag=true, OnC=46;
 
   //Método para reducir tamaño de tecla al presionarla
   var PresionarTecla = function (idtecla) {
@@ -33,21 +33,61 @@ var Calculadora = (function () {
   //Método para la lectura de los datos
   var IngresoDatos = function (event) {
     var tecla = event.which || event.keyCode;
-    //alert(tecla);
     if (tecla != OnC) {
        var datovalidado = ValidarDato(tecla);
+       var operadortemporal = "";
+       if (dato1=="") {
+         operadortemporal = RegistrarDatos_Operadores(datovalidado).operadoraritmetico;
+       }
+       else {
+         operadortemporal="";
+         flag=true;
+       };
+       var datotemporal = RegistrarDatos_Operadores(datovalidado).operando;
        if (datovalidado != "") {
-        PresionarTecla(datovalidado);
-        //AGREGAR ACUMULADORES PARA LAS OPERACIONES Y MOSTAR EN DISPLAY
-        //document.getElementById("display").innerHTML=String.fromCharCode(tecla);
-        document.getElementById("display").innerHTML=datovalidado;
+          PresionarTecla(datovalidado);
+          //AGREGAR ACUMULADORES PARA LAS OPERACIONES Y MOSTAR EN DISPLAY
+          if (data.length<8 && data.length>0 && operadortemporal=="") {
+              if ((datotemporal=="0" || datotemporal==".") && data=="0") {
+              }
+              else if (flag){
+                data = datotemporal;
+                document.getElementById("display").innerHTML=data;
+              }
+              else {
+                flag=false;
+                data = data + datotemporal;
+                document.getElementById("display").innerHTML=data;
+              }
+              //REGSITRAR EL SIGNO DEL OPERANDO
+              //signo1 = RegistrarDatos_Operadores(datovalidado).operador;
+          } else if (operadortemporal!="" && data!="0") {
+              dato1 = data;
+              data = "0";
+              operador = operadortemporal;
+              document.getElementById("display").innerHTML=operador;
+          } else if (data!="0" && datovalidado=="igual") {
+              dato2=data;
+              data = "0";
+              resultado=dato1+operador+dato2;
+              document.getElementById("display").innerHTML=resultado;
+          } else if (data1!="" && data2!="" && datovalidado=="igual") {
+              dato1=resultado;
+              resultado=dato1+operador+dato2;
+              document.getElementById("display").innerHTML=resultado;
+          } else if (data1!="" && data2!="" && datovalidado!="igual") {
+              dato1=""; dato2="", resultado=""; operador="";
+              data = data + datotemporal;
+              document.getElementById("display").innerHTML=data;
+          }
       };
+      //alert(data.length);
+
     } else {
-      PresionarTecla("on");
-      document.getElementById("display").innerHTML="0";
-      dato1=""; signo1="+"; dato2=""; signo2="+"; operador=""; resultado="";
+        PresionarTecla("on");
+        document.getElementById("display").innerHTML="0";
+        dato1=""; signo1="+"; dato2=""; signo2="+"; operador=""; resultado="";
     };
-    //Visualiza el dato en el DISPLAY
   };
   //Método para validar si el dato es NUMERO ó es un OPERADOR
   var ValidarDato = function (dato) {
@@ -105,6 +145,33 @@ var Calculadora = (function () {
         //alert("No es un dato para la Calculadora");
     };
     return TipoDato;
+  };
+  //Registrando los "Operandos" y "Operadores Aritméticas Básicas"
+  var RegistrarDatos_Operadores = function (datoperador) {
+    var operando="", operadoraritmetico="";
+    switch (datoperador) {
+      case "0": case "1": case "2": case "3": case "4":
+      case "5": case "6": case "7": case "8": case "9":
+        operando = datoperador;
+        break;
+      case "punto":
+        operando = ".";
+        break;
+      case "mas":
+        operadoraritmetico = "+";
+        break;
+      case "menos":
+      operadoraritmetico = "-";
+        break;
+      case "por":
+      operadoraritmetico = "*";
+        break;
+      case "dividido":
+      operadoraritmetico = "/";
+        break;
+      default:
+    };
+    return {operando, operadoraritmetico}
   };
   //Inicializando los métodos con eventos de teclado y mouse
   var iniciar = function () {
