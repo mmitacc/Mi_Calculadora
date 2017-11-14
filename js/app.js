@@ -1,7 +1,7 @@
 var Calculadora = (function () {
   //Declarando variables globales
-  var dato1="", signo1="+", dato2="", signo2="+",
-      operador="", resultado="", data="0", flag=true, OnC=46;
+  var dato1="0", signo1="+", dato2="0", signo2="+",
+      operador="+", resultado="0", data="0", EPunto=false, OnC=46;
 
   //Método para reducir tamaño de tecla al presionarla
   var PresionarTecla = function (idtecla) {
@@ -35,58 +35,89 @@ var Calculadora = (function () {
     var tecla = event.which || event.keyCode;
     if (tecla != OnC) {
        var datovalidado = ValidarDato(tecla);
-       var operadortemporal = "";
-       if (dato1=="") {
-         operadortemporal = RegistrarDatos_Operadores(datovalidado).operadoraritmetico;
+       PresionarTecla(datovalidado);
+       var EsOperador = FiltrarOperador(datovalidado);
+       if (datovalidado=="igual") {
+         dato2 = data;
+         resultado = eval(dato1 + operador + dato2);
+         document.getElementById("display").innerHTML=resultado;
+         dato1=resultado;
        }
        else {
-         operadortemporal="";
-         flag=true;
-       };
-       var datotemporal = RegistrarDatos_Operadores(datovalidado).operando;
-       if (datovalidado != "") {
-          PresionarTecla(datovalidado);
-          //AGREGAR ACUMULADORES PARA LAS OPERACIONES Y MOSTAR EN DISPLAY
-          if (data.length<8 && data.length>0 && operadortemporal=="") {
-              if ((datotemporal=="0" || datotemporal==".") && data=="0") {
-              }
-              else if (flag){
-                data = datotemporal;
-                document.getElementById("display").innerHTML=data;
-              }
-              else {
-                flag=false;
-                data = data + datotemporal;
-                document.getElementById("display").innerHTML=data;
-              }
-              //REGSITRAR EL SIGNO DEL OPERANDO
-              //signo1 = RegistrarDatos_Operadores(datovalidado).operador;
-          } else if (operadortemporal!="" && data!="0") {
-              dato1 = data;
-              data = "0";
-              operador = operadortemporal;
-              document.getElementById("display").innerHTML=operador;
-          } else if (data!="0" && datovalidado=="igual") {
-              dato2=data;
-              data = "0";
-              resultado=dato1+operador+dato2;
-              document.getElementById("display").innerHTML=resultado;
-          } else if (data1!="" && data2!="" && datovalidado=="igual") {
-              dato1=resultado;
-              resultado=dato1+operador+dato2;
-              document.getElementById("display").innerHTML=resultado;
-          } else if (data1!="" && data2!="" && datovalidado!="igual") {
-              dato1=""; dato2="", resultado=""; operador="";
-              data = data + datotemporal;
-              document.getElementById("display").innerHTML=data;
-          }
-      };
-      //alert(data.length);
-
-    } else {
+         switch (EsOperador) {
+           case true:
+                     switch (datovalidado) {
+                       case "mas":
+                         dato1=data;
+                         operador="+";
+                         document.getElementById("display").innerHTML=operador;
+                         data="0";
+                         EPunto=false;
+                       break;
+                       case "menos":
+                         dato1=data;
+                         operador="-";
+                         document.getElementById("display").innerHTML=operador;
+                         data="0";
+                         EPunto=false;
+                       break;
+                       case "por":
+                         dato1=data;
+                         operador="*";
+                         document.getElementById("display").innerHTML=operador;
+                         data="0";
+                         EPunto=false;
+                       break;
+                       case "dividido":
+                         dato1=data;
+                         operador="/";
+                         document.getElementById("display").innerHTML=operador;
+                         data="0";
+                         EPunto=false;
+                       break;
+                       default:
+                     };
+           break;
+           case false:
+                        if (datovalidado=="0" && data=="0") {
+                          //No hacer nada
+                        }
+                        else if (data.length<8) {
+                          if (datovalidado=="punto") {
+                            switch (EPunto) {
+                              case true:
+                              //No hacer nada
+                              break;
+                              case false:
+                              data = data + ".";
+                              document.getElementById("display").innerHTML=data;
+                              EPunto=true;
+                              break;
+                              default:
+                            }
+                          }
+                          else {
+                            if (data=="0"){
+                              data = datovalidado;
+                              document.getElementById("display").innerHTML=data;
+                            }
+                            else {
+                              data = data + datovalidado;
+                              document.getElementById("display").innerHTML=data;
+                            }
+                          };
+                        };
+           break;
+           default:
+         };
+       }
+    }
+    else {
         PresionarTecla("on");
         document.getElementById("display").innerHTML="0";
-        dato1=""; signo1="+"; dato2=""; signo2="+"; operador=""; resultado="";
+        dato1="0"; signo1="+"; dato2="0"; signo2="+";
+        operador="+"; resultado="0"; data="0"; EPunto=false;
+
     };
   };
   //Método para validar si el dato es NUMERO ó es un OPERADOR
@@ -147,31 +178,31 @@ var Calculadora = (function () {
     return TipoDato;
   };
   //Registrando los "Operandos" y "Operadores Aritméticas Básicas"
-  var RegistrarDatos_Operadores = function (datoperador) {
-    var operando="", operadoraritmetico="";
+  var FiltrarOperador = function (datoperador) {
+    var EsOperador;
     switch (datoperador) {
       case "0": case "1": case "2": case "3": case "4":
       case "5": case "6": case "7": case "8": case "9":
-        operando = datoperador;
+        EsOperador = false;
         break;
       case "punto":
-        operando = ".";
+        EsOperador = false;
         break;
       case "mas":
-        operadoraritmetico = "+";
+        EsOperador = true;
         break;
       case "menos":
-      operadoraritmetico = "-";
+        EsOperador = true;
         break;
       case "por":
-      operadoraritmetico = "*";
+        EsOperador = true;
         break;
       case "dividido":
-      operadoraritmetico = "/";
+        EsOperador = true;
         break;
       default:
     };
-    return {operando, operadoraritmetico}
+    return EsOperador;
   };
   //Inicializando los métodos con eventos de teclado y mouse
   var iniciar = function () {
