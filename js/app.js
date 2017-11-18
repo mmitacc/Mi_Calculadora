@@ -38,7 +38,7 @@ var Calculadora = (function () {
        PresionarTecla(datovalidado);
        var EsOperador = FiltrarOperador(datovalidado);
        if (datovalidado=="igual") {
-         dato2 = data;
+         dato2=data;
          resultado = eval(dato1 + operador + dato2);
          document.getElementById("display").innerHTML=resultado;
          dato1=resultado;
@@ -48,28 +48,48 @@ var Calculadora = (function () {
            case true:
                      switch (datovalidado) {
                        case "mas":
-                         dato1=data;
+                         if (resultado=="0") {
+                           dato1=data;
+                         }
+                         else {
+                           dato1=resultado;
+                         };
                          operador="+";
                          document.getElementById("display").innerHTML=operador;
                          data="0";
                          EPunto=false;
                        break;
                        case "menos":
+                       if (resultado=="0") {
                          dato1=data;
+                       }
+                       else {
+                         dato1=resultado;
+                       };
                          operador="-";
                          document.getElementById("display").innerHTML=operador;
                          data="0";
                          EPunto=false;
                        break;
                        case "por":
+                       if (resultado=="0") {
                          dato1=data;
+                       }
+                       else {
+                         dato1=resultado;
+                       };
                          operador="*";
                          document.getElementById("display").innerHTML=operador;
                          data="0";
                          EPunto=false;
                        break;
                        case "dividido":
+                       if (resultado=="0") {
                          dato1=data;
+                       }
+                       else {
+                         dato1=resultado;
+                       };
                          operador="/";
                          document.getElementById("display").innerHTML=operador;
                          data="0";
@@ -79,8 +99,9 @@ var Calculadora = (function () {
                      };
            break;
            case false:
+                        //if (resultado!="0") { data="0" };  //Inicializando DATA despues de una operacion aritmetica
                         if (datovalidado=="0" && data=="0") {
-                          //No hacer nada
+                            /*No hacer nada*/
                         }
                         else if (data.length<8) {
                           if (datovalidado=="punto") {
