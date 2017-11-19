@@ -1,7 +1,14 @@
 var Calculadora = (function () {
-  //Declarando variables globales
-  var dato1="0", signo1="+", dato2="0", signo2="+",
-      operador="+", resultado="0", data="0", EPunto=false, OnC=46;
+  //Declarando variables globales para una OPERACIÓN ARITMÉTICA BÁSICA:
+  var dato1="0",        //Este es el PRIMER DATO  a evaluar
+      signo1="+",       //Este es el SIGNO del PRIMER DATO  a evaluar
+      dato2="0",        //Este es el SEGUNDO DATO  a evaluar
+      signo2="+",       //Este es el SIGNO del SEGUNDO DATO  a evaluar
+      operador="+",     //Este es el OPERADOR ARITMETICO (+,-,*,/)
+      resultado="0",    //Este es el DATO RESULTANTE
+      data="0",         //Este es una VARIABLE ACUMULADORA Y TRANSITORIA para un DATO a evaluar
+      EPunto=false,     //Este es una VARIABLE tipo "Flag" para incrustar solo una vez el CARACTER DECIMAL (.)
+      OnC=46;           //Este es una VARIBLE CONSTANTE para definir la tecla "ON/C" para un evento del teclado
 
   //Método para reducir tamaño de tecla al presionarla
   var PresionarTecla = function (idtecla) {
@@ -31,75 +38,86 @@ var Calculadora = (function () {
     }
   };
   //Método para la lectura de los datos
-  var IngresoDatos = function (event) {
+  var IngresoDatosTeclado = function (event) {
     var tecla = event.which || event.keyCode;
     if (tecla != OnC) {
        var datovalidado = ValidarDato(tecla);
        PresionarTecla(datovalidado);
        var EsOperador = FiltrarOperador(datovalidado);
        if (datovalidado=="igual") {
+         //alert(dato1 + operador +  dato2);
          dato2=data;
-         resultado = eval(dato1 + operador + dato2);
-         document.getElementById("display").innerHTML=resultado;
+         var totalNumber = Number(eval(dato1 + operador + dato2));
+         var totalString = totalNumber.toString();
+         resultado = totalString;
+         if (totalString.length<8) {
+           document.getElementById("display").innerHTML=resultado;
+         }
+         else {
+           document.getElementById("display").innerHTML=totalNumber.toExponential(3);
+         };
          dato1=resultado;
        }
        else {
          switch (EsOperador) {
-           case true:
-                     switch (datovalidado) {
-                       case "mas":
-                         if (resultado=="0") {
-                           dato1=data;
-                         }
-                         else {
-                           dato1=resultado;
+           case true:    //Definiendo un dato OPERADOR
+                         switch (datovalidado) {
+                           case "mas":
+                             if (resultado=="0") {
+                               dato1=data;
+                             }
+                             else {
+                               dato1=resultado;
+                             };
+                             data="0";
+                             operador="+";
+                             document.getElementById("display").innerHTML=operador;
+                             EPunto=false;
+                           break;
+                           case "menos":
+                             if (resultado=="0") {
+                               dato1=data;
+                             }
+                             else {
+                               dato1=resultado;
+                             };
+                             data="0";
+                             operador="-";
+                             document.getElementById("display").innerHTML=operador;
+                             EPunto=false;
+                           break;
+                           case "por":
+                             if (resultado=="0") {
+                               dato1=data;
+                             }
+                             else {
+                               dato1=resultado;
+                             };
+                             data="0";
+                             operador="*";
+                             document.getElementById("display").innerHTML=operador;
+                             EPunto=false;
+                           break;
+                           case "dividido":
+                             if (resultado=="0") {
+                               dato1=data;
+                             }
+                             else {
+                               dato1=resultado;
+                             };
+                             data="0";
+                             operador="/";
+                             document.getElementById("display").innerHTML=operador;
+                             EPunto=false;
+                           break;
+                           default:
                          };
-                         operador="+";
-                         document.getElementById("display").innerHTML=operador;
-                         data="0";
-                         EPunto=false;
-                       break;
-                       case "menos":
-                       if (resultado=="0") {
-                         dato1=data;
-                       }
-                       else {
-                         dato1=resultado;
-                       };
-                         operador="-";
-                         document.getElementById("display").innerHTML=operador;
-                         data="0";
-                         EPunto=false;
-                       break;
-                       case "por":
-                       if (resultado=="0") {
-                         dato1=data;
-                       }
-                       else {
-                         dato1=resultado;
-                       };
-                         operador="*";
-                         document.getElementById("display").innerHTML=operador;
-                         data="0";
-                         EPunto=false;
-                       break;
-                       case "dividido":
-                       if (resultado=="0") {
-                         dato1=data;
-                       }
-                       else {
-                         dato1=resultado;
-                       };
-                         operador="/";
-                         document.getElementById("display").innerHTML=operador;
-                         data="0";
-                         EPunto=false;
-                       break;
-                       default:
-                     };
            break;
-           case false:
-                        //if (resultado!="0") { data="0" };  //Inicializando DATA despues de una operacion aritmetica
+           case false:  //Definiendo un dato NUMERICO ú OPERANDO
+                        if (resultado!="0") {
+                          dato2="0"; signo2="+"; resultado="0";  //Iniciaizando el segundo DATO y el RESULTADO
+                        };
+
                         if (datovalidado=="0" && data=="0") {
                             /*No hacer nada*/
                         }
@@ -136,12 +154,12 @@ var Calculadora = (function () {
     else {
         PresionarTecla("on");
         document.getElementById("display").innerHTML="0";
-        dato1="0"; signo1="+"; dato2="0"; signo2="+";
-        operador="+"; resultado="0"; data="0"; EPunto=false;
+        //Iniciaizando todas la variables
+        dato1="0"; signo1="+"; dato2="0"; signo2="+"; operador="+"; resultado="0"; data="0"; EPunto=false;
 
     };
   };
-  //Método para validar si el dato es NUMERO ó es un OPERADOR
+  //Método para validar si el dato es un NUMERO ó es un OPERADOR
   var ValidarDato = function (dato) {
     var TipoDato="";
     switch (dato) {
@@ -225,10 +243,14 @@ var Calculadora = (function () {
     };
     return EsOperador;
   };
-  //Inicializando los métodos con eventos de teclado y mouse
+  //Inicializando los métodos con eventos:
   var iniciar = function () {
-    document.onkeydown=IngresoDatos;
+    //Eventos con el Teclado:
+    document.onkeydown=IngresoDatosTeclado;
     document.onkeyup=SoltarTecla;
+    //Eventos "click" con el mouse
+    //document.getElementById("on").onmousedown=IngresoDatosMouse(46); //AL HACER CLICK EN EL ELEMENTO
+    //document.getElementById("nave_espacial").onmouseup=cambioFotoNave; //AL SALIR DEL MOUSE DEL ELEMENTO
   };
   return {
     iniciar : iniciar,
