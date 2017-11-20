@@ -8,21 +8,27 @@ var Calculadora = (function () {
       resultado="0",    //Este es el DATO RESULTANTE
       data="0",         //Este es una VARIABLE ACUMULADORA Y TRANSITORIA para un DATO a evaluar
       EPunto=false,     //Este es una VARIABLE tipo "Flag" para incrustar solo una vez el CARACTER DECIMAL (.)
-      OnC=46;           //Este es una VARIBLE CONSTANTE para definir la tecla "ON/C" para un evento del teclado
+      OnC="on";           //Este es una VARIBLE CONSTANTE para definir la tecla "ON/C" para un evento del teclado
 
   //Método para reducir tamaño de tecla al presionarla
   var PresionarTecla = function (idtecla) {
     var reducirtecla = document.getElementById(idtecla);
-    reducirtecla.style.background= "#bdbdbd";
+    reducirtecla.style.background= "#9e9e9e";
     reducirtecla.style.border= "1px solid #000000";
     reducirtecla.style.borderRadius="15px";
     reducirtecla.style.padding= "8px";
   };
   //Método para mantener tamaño original de la tecla al soltarla
   var SoltarTecla = function (event) {
-    var tecla = event.which || event.keyCode;
-    if (tecla != OnC) {
-      var datovalidado = ValidarDato(tecla);
+    var datovalidado="";
+    if (event.button==0) {            //Para eventos con el MOUSE
+      datovalidado = event.srcElement.id;
+    }
+    else {                            //Para eventos con el TECLADO
+      var tecla = event.which || event.keyCode;
+      datovalidado = ValidarDato(tecla);
+    };
+    if (datovalidado != OnC) {
       if (datovalidado != "") {
         var ampliartecla = document.getElementById(datovalidado);
         ampliartecla.style.background= "transparent";
@@ -38,14 +44,19 @@ var Calculadora = (function () {
     }
   };
   //Método para la lectura de los datos
-  var IngresoDatosTeclado = function (event) {
-    var tecla = event.which || event.keyCode;
-    if (tecla != OnC) {
-       var datovalidado = ValidarDato(tecla);
+  var IngresoDatos = function (event) {
+    var datovalidado="";
+    if (event.button==0) {            //Para eventos con el MOUSE
+      datovalidado = event.srcElement.id;
+    }
+    else {                            //Para eventos con el TECLADO
+      var tecla = event.which || event.keyCode;
+      datovalidado = ValidarDato(tecla);
+    };
+    if (datovalidado != OnC) {
        PresionarTecla(datovalidado);
        var EsOperador = FiltrarOperador(datovalidado);
        if (datovalidado=="igual") {
-         //alert(dato1 + operador +  dato2);
          dato2=data;
          var totalNumber = Number(eval(dato1 + operador + dato2));
          var totalString = totalNumber.toString();
@@ -114,8 +125,11 @@ var Calculadora = (function () {
                          };
            break;
            case false:  //Definiendo un dato NUMERICO ú OPERANDO
-                        if (resultado!="0") {
-                          dato2="0"; signo2="+"; resultado="0";  //Iniciaizando el segundo DATO y el RESULTADO
+                        if (resultado=="0") {
+                          //No hacer nada
+                        }
+                        else {    //Iniciaizando variables
+                          dato2="0"; signo2="+"; resultado="0"; data="0";
                         };
 
                         if (datovalidado=="0" && data=="0") {
@@ -133,7 +147,7 @@ var Calculadora = (function () {
                               EPunto=true;
                               break;
                               default:
-                            }
+                            };
                           }
                           else {
                             if (data=="0"){
@@ -143,7 +157,7 @@ var Calculadora = (function () {
                             else {
                               data = data + datovalidado;
                               document.getElementById("display").innerHTML=data;
-                            }
+                            };
                           };
                         };
            break;
@@ -163,6 +177,9 @@ var Calculadora = (function () {
   var ValidarDato = function (dato) {
     var TipoDato="";
     switch (dato) {
+      case 46:
+        TipoDato="on";
+        break;
       case 48: case 96:
         TipoDato="0";
         break;
@@ -246,11 +263,11 @@ var Calculadora = (function () {
   //Inicializando los métodos con eventos:
   var iniciar = function () {
     //Eventos con el Teclado:
-    document.onkeydown=IngresoDatosTeclado;
+    document.onkeydown=IngresoDatos;
     document.onkeyup=SoltarTecla;
-    //Eventos "click" con el mouse
-    //document.getElementById("on").onmousedown=IngresoDatosMouse(46); //AL HACER CLICK EN EL ELEMENTO
-    //document.getElementById("nave_espacial").onmouseup=cambioFotoNave; //AL SALIR DEL MOUSE DEL ELEMENTO
+    //Eventos con el Mouse
+    document.querySelector(".teclado").onmousedown=IngresoDatos;
+    document.querySelector(".teclado").onmouseup=SoltarTecla;
   };
   return {
     iniciar : iniciar,
