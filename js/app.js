@@ -7,8 +7,9 @@ var Calculadora = (function () {
       operador="+",     //Este es el OPERADOR ARITMETICO (+,-,*,/)
       resultado="0",    //Este es el DATO RESULTANTE
       data="0",         //Este es una VARIABLE ACUMULADORA Y TRANSITORIA para un DATO a evaluar
+      signo="+",        //Este es una VARIABLE TRANSITORIA para almacenar el SIGNO del DATA
       EPunto=false,     //Este es una VARIABLE tipo "Flag" para incrustar solo una vez el CARACTER DECIMAL (.)
-      OnC="on";           //Este es una VARIBLE CONSTANTE para definir la tecla "ON/C" para un evento del teclado
+      OnC="on";         //Este es una VARIBLE CONSTANTE para definir la tecla "ON/C" para un evento del teclado
 
   //Método para reducir tamaño de tecla al presionarla
   var PresionarTecla = function (idtecla) {
@@ -57,8 +58,27 @@ var Calculadora = (function () {
        PresionarTecla(datovalidado);
        var EsOperador = FiltrarOperador(datovalidado);
        if (datovalidado=="igual") {
-         dato2=data;
-         var totalNumber = Number(eval(dato1 + operador + dato2));
+         if (dato2 == "0") {
+           dato2=data;
+           signo2=signo;
+           data="0";
+           signo="+";
+         }
+         else {
+           data="0";
+           signo="+";
+         };
+         var totalNumber=0;
+         if (operador==signo) {     //Producto de simbolos aritmeticos, por exceso de concatenaciones
+           totalNumber = Number( eval( (signo1+dato1) + ("+") + (dato2) ) );
+         }
+         else if (operador=="*" || operador=="/") {
+           totalNumber = Number( eval( (signo1+dato1) + (operador) + (signo2+dato2) ) );
+         }
+         else{
+           totalNumber = Number( eval( (signo1+dato1) + ("-") + (dato2) ) );
+         };
+
          var totalString = totalNumber.toString();
          resultado = totalString;
          if (totalString.length<8) {
@@ -68,101 +88,162 @@ var Calculadora = (function () {
            document.getElementById("display").innerHTML=totalNumber.toExponential(3);
          };
          dato1=resultado;
+         signo1="+";
        }
        else {
-         switch (EsOperador) {
-           case true:    //Definiendo un dato OPERADOR
-                         switch (datovalidado) {
-                           case "mas":
-                             if (resultado=="0") {
-                               dato1=data;
-                             }
-                             else {
-                               dato1=resultado;
-                             };
-                             data="0";
-                             operador="+";
-                             document.getElementById("display").innerHTML=operador;
-                             EPunto=false;
-                           break;
-                           case "menos":
-                             if (resultado=="0") {
-                               dato1=data;
-                             }
-                             else {
-                               dato1=resultado;
-                             };
-                             data="0";
-                             operador="-";
-                             document.getElementById("display").innerHTML=operador;
-                             EPunto=false;
-                           break;
-                           case "por":
-                             if (resultado=="0") {
-                               dato1=data;
-                             }
-                             else {
-                               dato1=resultado;
-                             };
-                             data="0";
-                             operador="*";
-                             document.getElementById("display").innerHTML=operador;
-                             EPunto=false;
-                           break;
-                           case "dividido":
-                             if (resultado=="0") {
-                               dato1=data;
-                             }
-                             else {
-                               dato1=resultado;
-                             };
-                             data="0";
-                             operador="/";
-                             document.getElementById("display").innerHTML=operador;
-                             EPunto=false;
-                           break;
-                           default:
-                         };
-           break;
-           case false:  //Definiendo un dato NUMERICO ú OPERANDO
-                        if (resultado=="0") {
-                          //No hacer nada
-                        }
-                        else {    //Iniciaizando variables
-                          dato2="0"; signo2="+"; resultado="0"; data="0";
-                        };
+         if (datovalidado == "sign") {
+           if (data != "0") {
+             if (signo == "+") {
+               signo="-";
+               document.getElementById("display").innerHTML=signo+data;
+             }
+             else {
+               signo="+";
+               document.getElementById("display").innerHTML=data;
+             };
+           }
+           else if (resultado != "0") {
+             var dataNumber=Math.abs(resultado);
+             data=""+dataNumber;
+             if (resultado<0) {
+               signo="-";
+               document.getElementById("display").innerHTML=signo+data;
+             }
+             else {
+               signo="+"
+               document.getElementById("display").innerHTML=data;
+             };
+             resultado="0";
+           };
+         }
+         else {
+           switch (EsOperador) {
+             case true:    //Definiendo un dato OPERADOR
+                           switch (datovalidado) {
+                             case "mas":
+                               if (resultado=="0") {
+                                 dato1=data;
+                                 signo1=signo;
+                               }
+                               else {
+                                 dato1=resultado;
+                                 signo1="+";
+                                 resultado="0";
+                               };
+                               data="0";
+                               signo="+";
+                               dato2="0";
+                               signo2="+";
+                               operador="+";
+                               document.getElementById("display").innerHTML=operador;
+                               EPunto=false;
+                             break;
+                             case "menos":
+                               if (resultado=="0") {
+                                 dato1=data;
+                                 signo1=signo;
+                               }
+                               else {
+                                 dato1=resultado;
+                                 signo1="+";
+                                 resultado="0";
+                               };
+                               data="0";
+                               signo="+";
+                               dato2="0";
+                               signo2="+";
+                               operador="-";
+                               document.getElementById("display").innerHTML=operador;
+                               EPunto=false;
+                             break;
+                             case "por":
+                               if (resultado=="0") {
+                                 dato1=data;
+                                 signo1=signo;
+                               }
+                               else {
+                                 dato1=resultado;
+                                 signo1="+";
+                                 resultado="0";
+                               };
+                               data="0";
+                               signo="+";
+                               dato2="0";
+                               signo2="+";
+                               operador="*";
+                               document.getElementById("display").innerHTML=operador;
+                               EPunto=false;
+                             break;
+                             case "dividido":
+                               if (resultado=="0") {
+                                 dato1=data;
+                                 signo1=signo;
+                               }
+                               else {
+                                 dato1=resultado;
+                                 signo1="+";
+                                 resultado="0";
+                               };
+                               data="0";
+                               signo="+";
+                               dato2="0";
+                               signo2="+";
+                               operador="/";
+                               document.getElementById("display").innerHTML=operador;
+                               EPunto=false;
+                             break;
+                             default:
+                           };
+             break;
+             case false:  //Definiendo un dato NUMERICO ú OPERANDO
+                          if (resultado != "0") {
+                            resultado="0"; dato2="0"; signo2="+"; EPunto=false;
+                          };
 
-                        if (datovalidado=="0" && data=="0") {
-                            /*No hacer nada*/
-                        }
-                        else if (data.length<8) {
-                          if (datovalidado=="punto") {
-                            switch (EPunto) {
-                              case true:
-                              //No hacer nada
-                              break;
-                              case false:
-                              data = data + ".";
-                              document.getElementById("display").innerHTML=data;
-                              EPunto=true;
-                              break;
-                              default:
-                            };
+                          if (datovalidado=="0" && data=="0") {
+                              /*No hacer nada*/
                           }
-                          else {
-                            if (data=="0"){
-                              data = datovalidado;
-                              document.getElementById("display").innerHTML=data;
+                          else if (data.length<8) {
+                            if (datovalidado=="punto") {
+                              switch (EPunto) {
+                                case true:
+                                //No hacer nada
+                                break;
+                                case false:
+                                data = data + ".";
+                                if (signo=="-") {
+                                  document.getElementById("display").innerHTML=signo+data;
+                                } else {
+                                  document.getElementById("display").innerHTML=data;
+                                };
+                                EPunto=true;
+                                break;
+                                default:
+                              };
                             }
                             else {
-                              data = data + datovalidado;
-                              document.getElementById("display").innerHTML=data;
+                              if (data=="0"){
+                                data = datovalidado;
+                                if (signo=="-") {
+                                  document.getElementById("display").innerHTML=signo+data;
+                                } else {
+                                  document.getElementById("display").innerHTML=data;
+                                };
+                              }
+                              else{
+                                data = data + datovalidado;
+                                if (signo=="-") {
+                                  document.getElementById("display").innerHTML=signo+data;
+                                } else {
+                                  document.getElementById("display").innerHTML=data;
+                                };
+                              };
                             };
                           };
-                        };
-           break;
-           default:
-         };
+             break;
+             default:
+           };
+         }
        }
     }
     else {
